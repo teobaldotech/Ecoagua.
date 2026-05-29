@@ -1,129 +1,90 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EcoÁgua - Calculadora de Economia de Água</title>
+import React, { useState } from "react";
 
-<style>
+function EcoAgua() {
+  const [moradores, setMoradores] = useState("");
+  const [banhoTempo, setBanhoTempo] = useState("");
+  const [banhosDia, setBanhosDia] = useState("");
+  const [descargas, setDescargas] = useState("");
+  const [roupas, setRoupas] = useState("");
+  const [louca, setLouca] = useState("");
+  const [torneira, setTorneira] = useState("");
+  const [resultado, setResultado] = useState(null);
 
-body{
-font-family: Arial;
-background: linear-gradient(135deg,#0f2027,#203a43,#2c5364);
-color:white;
-text-align:center;
-padding:20px;
+  const calcular = () => {
+    if (!moradores || !banhoTempo || !banhosDia || !descargas || !roupas || !louca || !torneira) {
+      setResultado("Preencha todos os campos");
+      return;
+    }
+
+    // Médias de consumo
+    const litrosBanhoMin = 9;
+    const litrosDescarga = 12;
+    const litrosRoupa = 135; // por ciclo
+    const litrosLouca = 20;  // por lavagem
+    const litrosTorneiraMin = 10;
+
+    const consumoBanho = moradores * banhoTempo * banhosDia * litrosBanhoMin;
+    const consumoDescarga = moradores * descargas * litrosDescarga;
+    const consumoRoupa = roupas * litrosRoupa;
+    const consumoLouca = louca * litrosLouca;
+    const consumoTorneira = moradores * torneira * litrosTorneiraMin;
+
+    const consumoTotalDia = consumoBanho + consumoDescarga + consumoLouca + consumoTorneira;
+    const consumoMes = (consumoTotalDia * 30) + (consumoRoupa * 4); // roupas por semana
+    const economia = consumoMes * 0.25;
+
+    setResultado(`
+      Consumo diário: ${consumoTotalDia} litros
+      Consumo mensal: ${consumoMes} litros
+      Possível economia: ${economia.toFixed(0)} litros/mês
+    `);
+  };
+
+  return (
+    <div style={{
+      maxWidth: "400px",
+      margin: "auto",
+      background: "rgba(255,255,255,0.08)",
+      padding: "20px",
+      borderRadius: "15px",
+      boxShadow: "0 0 20px rgba(0,0,0,0.4)",
+      color: "white",
+      textAlign: "center",
+      fontFamily: "Arial"
+    }}>
+      <h1 style={{ color: "#00e5ff" }}>💧 EcoÁgua</h1>
+      <p>Calculadora de Consumo de Água</p>
+
+      <input type="number" placeholder="Número de moradores" value={moradores} onChange={e => setMoradores(e.target.value)} />
+      <input type="number" placeholder="Tempo médio de banho (minutos)" value={banhoTempo} onChange={e => setBanhoTempo(e.target.value)} />
+      <input type="number" placeholder="Banhos por pessoa/dia" value={banhosDia} onChange={e => setBanhosDia(e.target.value)} />
+      <input type="number" placeholder="Descargas por pessoa/dia" value={descargas} onChange={e => setDescargas(e.target.value)} />
+      <input type="number" placeholder="Máquinas de lavar roupa/semana" value={roupas} onChange={e => setRoupas(e.target.value)} />
+      <input type="number" placeholder="Lavagens de louça/dia" value={louca} onChange={e => setLouca(e.target.value)} />
+      <input type="number" placeholder="Minutos de torneira aberta/dia" value={torneira} onChange={e => setTorneira(e.target.value)} />
+
+      <button onClick={calcular} style={{
+        background: "#00e5ff",
+        border: "none",
+        padding: "12px",
+        width: "95%",
+        borderRadius: "10px",
+        fontSize: "16px",
+        fontWeight: "bold",
+        cursor: "pointer",
+        marginTop: "10px"
+      }}>Calcular Consumo</button>
+
+      <div style={{
+        marginTop: "20px",
+        padding: "15px",
+        background: "rgba(0,0,0,0.3)",
+        borderRadius: "10px"
+      }}>
+        {resultado ? resultado : "Resultado aparecerá aqui"}
+      </div>
+    </div>
+  );
 }
 
-.container{
-max-width:400px;
-margin:auto;
-background:rgba(255,255,255,0.08);
-padding:20px;
-border-radius:15px;
-box-shadow:0 0 20px rgba(0,0,0,0.4);
-}
-
-h1{
-color:#00e5ff;
-}
-
-input{
-width:90%;
-padding:10px;
-margin:8px;
-border-radius:8px;
-border:none;
-font-size:16px;
-}
-
-button{
-background:#00e5ff;
-border:none;
-padding:12px;
-width:95%;
-border-radius:10px;
-font-size:16px;
-font-weight:bold;
-cursor:pointer;
-}
-
-button:hover{
-background:#00bcd4;
-}
-
-.resultado{
-margin-top:20px;
-padding:15px;
-background:rgba(0,0,0,0.3);
-border-radius:10px;
-}
-
-</style>
-</head>
-
-<body>
-
-<div class="container">
-
-<h1>💧 EcoÁgua</h1>
-<p>Calculadora de Consumo de Água</p>
-
-<input type="number" id="moradores" placeholder="Número de moradores">
-
-<input type="number" id="banhoTempo" placeholder="Tempo médio de banho (minutos)">
-
-<input type="number" id="banhosDia" placeholder="Banhos por pessoa/dia">
-
-<input type="number" id="descargas" placeholder="Descargas por pessoa/dia">
-
-<button onclick="calcular()">Calcular Consumo</button>
-
-<div class="resultado" id="resultado">
-Resultado aparecerá aqui
-</div>
-
-</div>
-
-<script>
-
-function calcular(){
-
-let moradores = parseInt(document.getElementById("moradores").value);
-let banhoTempo = parseInt(document.getElementById("banhoTempo").value);
-let banhosDia = parseInt(document.getElementById("banhosDia").value);
-let descargas = parseInt(document.getElementById("descargas").value);
-
-if(!moradores || !banhoTempo || !banhosDia || !descargas){
-document.getElementById("resultado").innerHTML="Preencha todos os campos";
-return;
-}
-
-let litrosBanhoMin = 9;
-let litrosDescarga = 12;
-
-let consumoBanho = moradores * banhoTempo * banhosDia * litrosBanhoMin;
-let consumoDescarga = moradores * descargas * litrosDescarga;
-
-let consumoTotalDia = consumoBanho + consumoDescarga;
-let consumoMes = consumoTotalDia * 30;
-
-let economia = consumoMes * 0.25;
-
-document.getElementById("resultado").innerHTML = `
-<h3>Resultado</h3>
-
-Consumo diário: <b>${consumoTotalDia} litros</b><br><br>
-
-Consumo mensal: <b>${consumoMes} litros</b><br><br>
-
-Possível economia: <b>${economia.toFixed(0)} litros/mês</b>
-
-`;
-
-}
-
-</script>
-
-</body>
-</html>
+export default EcoAgua;
